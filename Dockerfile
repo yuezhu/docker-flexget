@@ -1,28 +1,24 @@
-FROM     python:3.6-alpine
+FROM python:3.6-alpine
 
-# Dependencies
-RUN      apk add --no-cache gcc tzdata musl-dev
+RUN apk add --no-cache tzdata shadow gcc musl-dev
 
-ENV      TZ=America/New_York
-ENV      LOGLEVEL=info
+ENV TZ=America/New_York
 
-ARG      DOCKER_UID
-ARG      DOCKER_GID
+RUN \
+    sed -i 's/^CREATE_MAIL_SPOOL=yes/CREATE_MAIL_SPOOL=no/' /etc/default/useradd && \
+    groupmod -g 100 users && \
+    useradd -u 1024 -U -d /app -s /bin/false app && \
+    usermod -G users app
 
-# Create a user to run the application
-RUN      adduser -D -u ${DOCKER_UID} -g ${DOCKER_GID} flexget
-WORKDIR  /home/flexget
+VOLUME \
+    /app/.flexget \
+    /app/torrents
 
-# Data and config volumes
-VOLUME   /home/flexget/.flexget
-VOLUME   /home/flexget/torrents
+RUN \
+    pip3 install -U pip && \
+    pip3 install flexget transmissionrpc
 
-# Install FlexGet
-RUN      pip3 install -U pip && pip3 install flexget transmissionrpc
+ADD ./entrypoint.sh /entrypoint.sh
+RUN chmod a+x /entrypoint.sh
 
-# Add start script
-COPY     start.sh /home/flexget/
-RUN      chmod +x ./start.sh
-
-USER     flexget
-CMD      ["./start.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
