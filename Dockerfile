@@ -1,6 +1,10 @@
 FROM python:3.6-alpine
 
-RUN apk add --no-cache tzdata shadow gcc musl-dev su-exec
+RUN apk add --no-cache \
+    tzdata \
+    shadow \
+    gcc \
+    musl-dev
 
 ENV TZ=America/New_York
 
@@ -10,9 +14,7 @@ RUN \
     useradd -u 1024 -U -d /app -s /bin/sh app && \
     usermod -G users app
 
-VOLUME \
-    /app/.flexget \
-    /app/torrents
+VOLUME /app/.flexget
 
 RUN \
     pip3 install -U pip && \
