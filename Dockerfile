@@ -1,4 +1,4 @@
-FROM python:3.6-alpine
+FROM python:3.8-alpine
 
 RUN apk add --no-cache \
     tzdata \
@@ -6,7 +6,7 @@ RUN apk add --no-cache \
     gcc \
     musl-dev
 
-ENV TZ=America/New_York
+ENV TZ=UTC
 
 RUN \
     sed -i 's/^CREATE_MAIL_SPOOL=yes/CREATE_MAIL_SPOOL=no/' /etc/default/useradd && \
@@ -14,7 +14,7 @@ RUN \
     useradd -u 1024 -U -d /app -s /bin/sh app && \
     usermod -G users app
 
-VOLUME /app/.flexget
+VOLUME /config /downloads
 
 RUN \
     pip3 install -U pip && \

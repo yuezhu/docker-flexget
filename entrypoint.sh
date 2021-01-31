@@ -4,13 +4,17 @@ set -e -x
 
 PUID=${PUID:-1024}
 PGID=${PGID:-100}
-LOGLEVEL=${LOGLEVEL:-verbose}
+LOGLEVEL=${LOGLEVEL:-info}
+CONFIG=${CONFIG:-/config/config.yml}
 
 groupmod -o -g "$PGID" app
 usermod -o -u "$PUID" app
 
-if [ -f /app/.flexget/.config-lock ]; then
-    rm /app/.flexget/.config-lock
+if [ -f /config/.config-lock ]; then
+    rm /config/.config-lock
 fi
 
-exec su -s /bin/sh -c "/usr/local/bin/flexget --loglevel $LOGLEVEL daemon start" -- app
+exec \
+    su -s /bin/sh \
+    -c "/usr/local/bin/flexget -c \"$CONFIG\" -L \"$LOGLEVEL\" daemon start" \
+    -- app
