@@ -11,7 +11,7 @@ groupmod -o -g "$PGID" app
 usermod -o -u "$PUID" app
 
 if [ -f /config/.config-lock ]; then
-    rm /config/.config-lock
+    rm -f /config/.config-lock
 fi
 
 exec \
