@@ -1,6 +1,8 @@
-.PHONY: build push
+.PHONY: build push all
 
 TAG := latest
+
+all: build push
 
 build:
 	docker build -t yuezhu/flexget:$(TAG) .
