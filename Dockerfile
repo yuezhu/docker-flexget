@@ -14,7 +14,8 @@ RUN \
     && \
     apk add --no-cache \
     tzdata \
-    shadow
+    shadow \
+    jq
 
 ENV TZ=UTC
 
@@ -30,7 +31,7 @@ VOLUME \
 
 RUN \
     pip install --no-cache-dir -U pip && \
-    pip install --no-cache-dir -U flexget python-telegram-bot==12.8 && \
+    pip install --no-cache-dir -U flexget python-telegram-bot==12.8 psutil && \
     apk del --purge build-dependencies && \
     rm -rf \
     /var/cache/apk/* \
