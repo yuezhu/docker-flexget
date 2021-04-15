@@ -1,4 +1,4 @@
-FROM python:3.9.1-alpine
+FROM python:alpine
 
 RUN \
     apk add --no-cache --virtual=build-dependencies \
@@ -13,6 +13,7 @@ RUN \
     libpng-dev \
     && \
     apk add --no-cache \
+    g++ \
     tzdata \
     shadow \
     jq
