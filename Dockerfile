@@ -3,15 +3,17 @@ FROM python:alpine
 RUN \
     apk add --no-cache --virtual=build-dependencies \
     build-base \
-    rust \
-    cargo \
     libffi-dev \
     openssl-dev \
     zlib-dev \
     jpeg-dev \
     freetype-dev \
     libpng-dev \
+    # required by python-telegram-bot
+    rust \
+    cargo \
     && \
+    # Runtime dependencies
     apk add --no-cache \
     g++ \
     tzdata \
