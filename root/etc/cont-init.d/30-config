@@ -1,0 +1,8 @@
+#!/usr/bin/with-contenv bash
+
+# make folders
+mkdir -p /config/flexget
+
+# permissions
+chown -R abc:abc \
+    /config

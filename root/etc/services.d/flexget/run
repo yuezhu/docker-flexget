@@ -1,0 +1,24 @@
+#!/usr/bin/with-contenv bash
+
+LOG_LEVEL=${LOG_LEVEL:-INFO}
+LOG_FILE=${LOG_FILE:-/config/flexget/flexget.log}
+CONFIG=${CONFIG:-/config/flexget/config.yml}
+
+if [ -f /config/flexget/.config-lock ]; then
+    rm -f /config/flexget/.config-lock
+fi
+
+if [ -n "${WEBUI_PASSWD}" ]; then
+    s6-setuidgid abc /usr/bin/flexget \
+                 -c "${CONFIG}" \
+                 --loglevel "${LOG_LEVEL}" \
+                 --logfile "${LOG_FILE}" \
+                 web passwd "${WEBUI_PASSWD}"
+fi
+
+exec \
+    s6-setuidgid abc /usr/bin/flexget \
+                 -c "${CONFIG}" \
+                 --loglevel "${LOG_LEVEL}" \
+                 --logfile "${LOG_FILE}" \
+                 daemon start

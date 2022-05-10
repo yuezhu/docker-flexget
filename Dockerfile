@@ -1,48 +1,40 @@
-FROM python:alpine
+FROM ghcr.io/linuxserver/baseimage-alpine:edge
 
+# environment settings
+ENV HOME="/config" \
+XDG_CONFIG_HOME="/config" \
+XDG_DATA_HOME="/config" \
+TZ="UTC"
+
+# install runtime packages and flexget
 RUN \
-    apk add --no-cache --virtual=build-dependencies \
+  echo "**** install build packages ****" && \
+  apk add --no-cache --upgrade --virtual=build-dependencies \
     build-base \
-    libffi-dev \
-    openssl-dev \
-    zlib-dev \
-    jpeg-dev \
-    freetype-dev \
-    libpng-dev \
-    # required by python-telegram-bot
-    rust \
-    cargo \
-    && \
-    # Runtime dependencies
-    apk add --no-cache \
+    make \
     g++ \
-    tzdata \
-    shadow \
-    jq
+    gcc \
+    python3-dev \
+    libffi-dev && \
+  echo "**** install packages ****" && \
+  apk add -U --update --no-cache \
+    curl \
+    python3 \
+    py3-pip && \
+  echo "***** install flexget ****" && \
+  pip install --no-cache-dir -U pip && \
+  pip install --no-cache-dir -U psutil flexget python-telegram-bot==12.8 && \
+  echo "**** cleanup ****" && \
+  apk del --purge \
+    build-dependencies && \
+  rm -rf \
+    /root/.cache \
+    /tmp/*
 
-ENV TZ=UTC
+# add local files
+COPY root/ /
 
-RUN \
-    sed -i 's/^CREATE_MAIL_SPOOL=yes/CREATE_MAIL_SPOOL=no/' /etc/default/useradd && \
-    groupmod -g 100 users && \
-    useradd -u 1024 -U -d /app -s /bin/sh app && \
-    usermod -G users app
+# ports and volumes
+EXPOSE 8081
 
-VOLUME \
-    /config \
-    /downloads
-
-RUN \
-    pip install --no-cache-dir -U pip && \
-    pip install --no-cache-dir -U flexget python-telegram-bot==12.8 psutil && \
-    apk del --purge build-dependencies && \
-    rm -rf \
-    /var/cache/apk/* \
-    /tmp/* \
-    /root/.cache
-
-ADD ./entrypoint.sh /entrypoint.sh
-
-RUN chmod a+x /entrypoint.sh
-
-ENTRYPOINT ["/entrypoint.sh"]
+VOLUME /config
